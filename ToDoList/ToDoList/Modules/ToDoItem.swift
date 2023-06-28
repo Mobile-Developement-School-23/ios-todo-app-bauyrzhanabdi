@@ -11,7 +11,7 @@ struct ToDoItem {
         static let modifyDate = "modifyDate"
     }
     
-    enum Importance: String {
+    enum Importance: String, CaseIterable {
         case low = "неважная"
         case regular = "обычная"
         case high = "важная"
@@ -50,7 +50,7 @@ extension ToDoItem {
             Format.id: self.id,
             Format.text: self.text,
             Format.isCompleted: self.isCompleted,
-            Format.createDate: self.createDate
+            Format.createDate: self.createDate.simplified
         ]
         
         switch importance {
