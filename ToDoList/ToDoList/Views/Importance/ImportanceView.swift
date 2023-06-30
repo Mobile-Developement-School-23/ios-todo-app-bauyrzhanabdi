@@ -22,6 +22,10 @@ final class ImportanceView: UIView {
         static let segmentedViewBottomOffset: CGFloat = 2
         static let segmentedViewLeadingOffset: CGFloat = 2
         static let segmentedViewTrailingOffset: CGFloat = 2
+        
+        static let separatorViewLeadingOffset: CGFloat = 16
+        static let separatorViewTrailingOffset: CGFloat = 16
+        static let separatorViewHeight: CGFloat = 0.5
     }
     
     // MARK: - Outlets
@@ -30,6 +34,7 @@ final class ImportanceView: UIView {
         let label = UILabel()
         label.font = YandexFont.body.font
         label.text = "Важность"
+        label.textColor = YandexColor.labelPrimary.color
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -44,7 +49,7 @@ final class ImportanceView: UIView {
     
     private lazy var segmentedView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .vertical
+        stackView.axis = .horizontal
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -72,6 +77,11 @@ final class ImportanceView: UIView {
         control.translatesAutoresizingMaskIntoConstraints = false
         return control
     }()
+    
+    private lazy var separatorView: SeparatorView = {
+        let view = SeparatorView()
+        return view
+    }()
         
     // MARK: - Properties
     
@@ -89,7 +99,17 @@ final class ImportanceView: UIView {
     
     // MARK: - Initialization
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+        setupHierarchy()
+        setupLayout()
+        setupSeparator()
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Setup
     
@@ -100,6 +120,7 @@ final class ImportanceView: UIView {
     private func setupHierarchy() {
         addSubview(titleLabel)
         addSubview(containerView)
+        addSubview(separatorView)
         
         containerView.addSubview(segmentedView)
         
@@ -113,7 +134,7 @@ final class ImportanceView: UIView {
             
             titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: Constants.titleLabelTopOffset),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.titleLabelLeadingOffset),
-            titleLabel.bottomAnchor.constraint(equalTo: topAnchor, constant: Constants.titleLabelTopOffset),
+            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Constants.titleLabelBottomOffset),
             
             containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
             containerView.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: Constants.containerViewLeadingOffset),
@@ -124,10 +145,18 @@ final class ImportanceView: UIView {
             segmentedView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -Constants.segmentedViewTrailingOffset),
             segmentedView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -Constants.segmentedViewBottomOffset),
         
+            separatorView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.separatorViewLeadingOffset),
+            separatorView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.separatorViewTrailingOffset),
+            separatorView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: Constants.separatorViewHeight)
         ])
     }
     
     private func setupSeparator() {
+        importanceControls.forEach { control in
+            control.isHiddenSeparator = false
+        }
+        
         importanceControls.forEach { control in
             let isSameImportance = control.importance == selectedImportance
             control.isSelected = isSameImportance

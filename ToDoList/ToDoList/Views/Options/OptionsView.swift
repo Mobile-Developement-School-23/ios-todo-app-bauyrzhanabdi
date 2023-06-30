@@ -5,6 +5,10 @@ protocol OptionsViewDelegate: AnyObject {
     func didSelectDeadline(_ date: Date?)
 }
 
+protocol OptionsViewCalendarDelegate: AnyObject {
+    func didChangeSelectionBehavior(_ isSelected: Bool, _ deadline: Date)
+}
+
 final class OptionsView: UIStackView {
     
     // MARK: - Constants
@@ -17,7 +21,7 @@ final class OptionsView: UIStackView {
     
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
-        
+        stackView.axis = .vertical
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -29,8 +33,17 @@ final class OptionsView: UIStackView {
         return view
     }()
     
-    private lazy var separatorView: SeparatorView = {
-        let view = SeparatorView()
+    private lazy var deadlineView: DeadlineView = {
+        let view = DeadlineView()
+        view.addTarget(self, action: #selector(deadlinePressed), for: .touchUpInside)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var calendarView: CalendarView = {
+        let view = CalendarView()
+        view.isHidden = true
+        view.delegate = self
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -38,6 +51,15 @@ final class OptionsView: UIStackView {
     // MARK: - Properties
     
     weak var delegate: OptionsViewDelegate?
+    private weak var calendarDelegate: OptionsViewCalendarDelegate?
+    
+    var defaultDeadline: Date {
+        return Calendar.iso8601Calendar.date(
+            byAdding: .day,
+            value: 1,
+            to: Date()
+        ) ?? Date()
+    }
     
     // MARK: - Initialization
     
@@ -57,12 +79,15 @@ final class OptionsView: UIStackView {
     private func setupView() {
         layer.cornerRadius = Constants.cornerRadius
         backgroundColor = YandexColor.backSecondary.color
+        calendarDelegate = calendarView
     }
     
     private func setupHierarchy() {
         addSubview(stackView)
         
         stackView.addArrangedSubview(importanceView)
+        stackView.addArrangedSubview(deadlineView)
+        stackView.addArrangedSubview(calendarView)
     }
     
     private func setupLayout() {
@@ -75,6 +100,18 @@ final class OptionsView: UIStackView {
     }
     
     // MARK: - Methods
+    
+    @objc private func deadlinePressed(_ sender: DeadlineView) {
+        sender.isSelected.toggle()
+        deadlineView.deadline = sender.isSelected ? defaultDeadline : nil
+        calendarDelegate?.didChangeSelectionBehavior(sender.isSelected, defaultDeadline)
+        
+        UIView.animate(withDuration: 0.5) { [weak self] in
+            self?.calendarView.isHidden = !sender.isSelected
+        }
+        
+        delegate?.didSelectDeadline(sender.isSelected ? defaultDeadline : nil)
+    }
 }
 
 // MARK: - Delegate Extensions
@@ -82,5 +119,12 @@ final class OptionsView: UIStackView {
 extension OptionsView: ImportanceViewDelegate {
     func didSelectImportance(_ importance: ToDoItem.Importance) {
         delegate?.didSelectImportance(importance)
+    }
+}
+
+extension OptionsView: CalendarViewDelegate {
+    func didSelectDate(_ date: Date) {
+        deadlineView.deadline = date
+        delegate?.didSelectDeadline(date)
     }
 }
