@@ -42,7 +42,6 @@ final class ImportanceControl: UIControl {
         case .low:
             let imageView = UIImageView()
             imageView.image = YandexImage.arrowDown.image
-            imageView.center = center
             imageView.translatesAutoresizingMaskIntoConstraints = false
             return imageView
         case .regular:
@@ -50,13 +49,11 @@ final class ImportanceControl: UIControl {
             label.font = YandexFont.subhead.font
             label.textColor = YandexColor.labelPrimary.color
             label.text = "нет"
-            label.center = center
             label.translatesAutoresizingMaskIntoConstraints = false
             return label
         case .high:
             let imageView = UIImageView()
             imageView.image = YandexImage.exclamationMark.image
-            imageView.center = center
             imageView.translatesAutoresizingMaskIntoConstraints = false
             return imageView
         }
@@ -98,6 +95,11 @@ final class ImportanceControl: UIControl {
     }
     
     private func setupLayout() {
+        NSLayoutConstraint.activate([
+            infoView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            infoView.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
+        
         if let separatorView = separatorView {
             NSLayoutConstraint.activate([
                 separatorView.topAnchor.constraint(equalTo: topAnchor, constant: Constants.separatorViewTopOffset),

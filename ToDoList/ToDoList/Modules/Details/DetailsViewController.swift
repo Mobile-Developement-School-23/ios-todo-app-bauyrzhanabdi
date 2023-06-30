@@ -41,6 +41,7 @@ class DetailsViewController: UIViewController {
     
     private lazy var optionsView: OptionsView = {
         let view = OptionsView()
+        view.delegate = self
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -55,6 +56,7 @@ class DetailsViewController: UIViewController {
     // MARK: - Properties
     
     
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -67,7 +69,7 @@ class DetailsViewController: UIViewController {
     // MARK: - Setup
     
     private func setupView() {
-        view.backgroundColor = .yellow
+        view.backgroundColor = YandexColor.backPrimary.color
     }
     
     private func setupHierarchy() {
@@ -93,8 +95,6 @@ class DetailsViewController: UIViewController {
             stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -Constants.stackViewWidthOffset),
             
-            optionsView.heightAnchor.constraint(equalToConstant: 100),
-            
             textView.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textViewHeight)
         ])
     }
@@ -102,7 +102,20 @@ class DetailsViewController: UIViewController {
     // MARK: - Methods
 
     @objc private func deleteButtonPressed(_ sender: DeleteButton) {
-        
+        print("delete button pressed")
+    }
+    
+}
+
+// MARK: - Delegate Extensions
+
+extension DetailsViewController: OptionsViewDelegate {
+    func didSelectImportance(_ importance: ToDoItem.Importance) {
+        print("selected importance: \(importance)")
+    }
+    
+    func didSelectDeadline(_ date: Date?) {
+        print("selected date \(date)")
     }
     
 }
