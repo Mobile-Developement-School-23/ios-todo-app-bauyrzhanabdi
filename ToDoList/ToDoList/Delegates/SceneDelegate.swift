@@ -1,19 +1,31 @@
 import UIKit
+import CocoaLumberjackSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    let fileLogger: DDFileLogger = .init()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow (windowScene: windowScene)
-//        let rootViewController = DetailsViewController()
         let rootViewController = NotesViewController()
         let navigationController = UINavigationController(rootViewController: rootViewController)
         window.rootViewController = navigationController
         window.makeKeyAndVisible()
         self.window = window
+        
+        setupFileLogger()
+        DDLogInfo("scene did finish loading")
+    }
+    
+    private func setupFileLogger() {
+        DDLog.add(DDOSLogger.sharedInstance) // Uses os_log
+
+        let fileLogger: DDFileLogger = DDFileLogger() // File Logger
+        fileLogger.rollingFrequency = 60 * 60 * 24 // 24 hours
+        fileLogger.logFileManager.maximumNumberOfLogFiles = 7
+        DDLog.add(fileLogger)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

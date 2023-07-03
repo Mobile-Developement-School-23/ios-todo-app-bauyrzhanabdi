@@ -1,6 +1,6 @@
 import Foundation
 
-struct ToDoItem {
+public struct ToDoItem {
     private enum Format {
         static let id = "id"
         static let text = "text"
@@ -11,21 +11,21 @@ struct ToDoItem {
         static let modifyDate = "modifyDate"
     }
     
-    enum Importance: String, CaseIterable {
+    public enum Importance: String, CaseIterable {
         case low = "неважная"
         case regular = "обычная"
         case high = "важная"
     }
     
-    let id: String
-    let text: String
-    let importance: Importance
-    let deadline: Date?
-    let isCompleted: Bool
-    let createDate: Date
-    let modifyDate: Date?
+    public let id: String
+    public let text: String
+    public let importance: Importance
+    public let deadline: Date?
+    public let isCompleted: Bool
+    public let createDate: Date
+    public let modifyDate: Date?
     
-    init(
+    public init(
         id: String = UUID().uuidString,
         text: String,
         importance: Importance,
@@ -44,8 +44,8 @@ struct ToDoItem {
     }
 }
 
-extension ToDoItem {
-    var json: Any {
+public extension ToDoItem {
+    public var json: Any {
         var object: [String: Any] = [
             Format.id: self.id,
             Format.text: self.text,
@@ -80,7 +80,7 @@ extension ToDoItem {
         return object
     }
     
-    static func parse(json: Any) -> ToDoItem? {
+    public static func parse(json: Any) -> ToDoItem? {
         
         do {
             guard
